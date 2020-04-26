@@ -110,6 +110,7 @@ Library
                   Graphics.Implicit.Export.Render.RefineSegs
                   Graphics.Implicit.Export.Render.TesselateLoops
                   Graphics.Implicit.Export.Render.HandlePolylines
+                  Graphics.Implicit.Export.GLSL
 
 Executable extopenscad
    Main-is: extopenscad.hs

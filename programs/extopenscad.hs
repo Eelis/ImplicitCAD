@@ -16,7 +16,7 @@
 import Prelude (Read(readsPrec), Maybe(Just, Nothing), IO, Bool(True, False), FilePath, Show, Eq, String, (<>), ($), (*), (/), (==), (>), (**), (-), readFile, minimum, drop, error, fst, min, sqrt, tail, take, length, putStrLn, show, (>>=), lookup, return, unlines, filter, not, null, (||), (&&), (.))
 
 -- Our Extended OpenScad interpreter, and functions to write out files in designated formats.
-import Graphics.Implicit (runOpenscad, writeSVG, writeDXF2, writeBinSTL, writeSTL, writeOBJ, writeSCAD2, writeSCAD3, writeGCodeHacklabLaser, writePNG2, writePNG3)
+import Graphics.Implicit (runOpenscad, writeSVG, writeDXF2, writeBinSTL, writeSTL, writeOBJ, writeSCAD2, writeSCAD3, writeGCodeHacklabLaser, writePNG2, writePNG3, writeGLSL)
 
 -- Functions for finding a box around an object, so we can define the area we need to raytrace inside of.
 import Graphics.Implicit.ObjectUtil (getBox2, getBox3)
@@ -79,6 +79,7 @@ data OutputFormat
     | OBJ
 --  | 3MF
     | DXF
+    | GLSL
     deriving (Show, Eq)
 
 -- | A list mapping file extensions to output formats.
@@ -94,6 +95,7 @@ formatExtensions =
     , ("obj", OBJ)
 --  , ("3mf", 3MF)
     , ("dxf", DXF)
+    , ("glsl", GLSL)
     ]
 
 -- | Lookup an output format for a given output file. Throw an error if one cannot be found.
@@ -223,6 +225,7 @@ export3 posFmt res output obj =
         Just SCAD     -> writeSCAD3 res output obj
         Just OBJ      -> writeOBJ res output obj
         Just PNG      -> writePNG3 res output obj
+        Just GLSL     -> writeGLSL res output obj
         Nothing       -> writeBinSTL res output obj
         Just fmt      -> putStrLn $ "Unrecognized 3D format: " <> show fmt
 

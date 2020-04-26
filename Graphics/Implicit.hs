@@ -20,7 +20,8 @@ module Graphics.Implicit (
   writeSCAD3,
   writeGCodeHacklabLaser,
   writePNG2,
-  writePNG3
+  writePNG3,
+  writeGLSL
 ) where
 
 import Prelude(FilePath, IO)
@@ -37,6 +38,8 @@ import Graphics.Implicit.Definitions as W (ℝ, SymbolicObj2, SymbolicObj3)
 
 -- Functions for writing files based on the result of operations on primitives.
 import qualified Graphics.Implicit.Export as Export (writeSVG, writeDXF2, writeSTL, writeBinSTL, writeOBJ, writeSCAD2, writeSCAD3, writeTHREEJS, writeGCodeHacklabLaser, writePNG)
+
+import qualified Graphics.Implicit.Export.GLSL as GLSLExport (writeGLSL)
 
 -- We want Export to be a bit less polymorphic
 -- (so that types will collapse nicely)
@@ -74,3 +77,5 @@ writePNG2 = Export.writePNG
 writePNG3 :: ℝ -> FilePath -> SymbolicObj3  -> IO ()
 writePNG3 = Export.writePNG
 
+writeGLSL :: ℝ -> FilePath -> SymbolicObj3  -> IO ()
+writeGLSL = GLSLExport.writeGLSL
