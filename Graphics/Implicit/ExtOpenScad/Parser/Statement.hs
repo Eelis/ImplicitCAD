@@ -25,7 +25,7 @@ import Graphics.Implicit.ExtOpenScad.Parser.Expr (expr0)
 import Graphics.Implicit.ExtOpenScad.Parser.Lexer (whiteSpace, matchFunction, matchInclude, matchUse, matchIf, matchElse, matchModule, matchTok, matchComma, matchSemi, surroundedBy, matchIdentifier)
 
 -- We use parsec to parse.
-import Text.Parsec (SourceName, (<?>), sepBy, oneOf, getPosition, parse, eof, ParseError, many, noneOf, option, between, char, optionMaybe)
+import Text.Parsec (SourceName, (<?>), sepBy, oneOf, getPosition, parse, eof, ParseError, many, noneOf, option, optional, between, char, optionMaybe)
 
 import Text.Parsec.String (GenParser)
 
@@ -64,10 +64,9 @@ computation A2 =
   <|>
   userModuleDeclaration
   <|> -- Non suite statements. Semicolon needed...
-  ( include
-    <|>
-    function
-  ) <* matchSemi
+  include <* optional matchSemi
+  <|>
+  function <* matchSemi
   *<|>
   assignment <* matchSemi
 
