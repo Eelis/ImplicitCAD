@@ -7,11 +7,11 @@ module Graphics.Implicit.ObjectUtil.GetBox3 (getBox3) where
 
 import Prelude(Eq, Bool(False), Fractional, Either (Left, Right), (==), (||), max, (/), (-), (+), fmap, unzip, ($), filter, not, (.), unzip3, minimum, maximum, min, (>), (&&), head, (*), (<), abs, either, error, const, otherwise, take, fst, snd)
 
-import Graphics.Implicit.Definitions (ℝ, Fastℕ, Box3, SymbolicObj3 (Rect3R, Sphere, Cylinder, Complement3, UnionR3, IntersectR3, DifferenceR3, Translate3, Scale3, Rotate3, Rotate3V, Shell3, Outset3, EmbedBoxedObj3, ExtrudeR, ExtrudeOnEdgeOf, ExtrudeRM, RotateExtrude, ExtrudeRotateR), SymbolicObj2 (Rotate2, RectR), (⋯*), fromFastℕtoℝ, fromFastℕ)
+import Graphics.Implicit.Definitions (ℝ, Fastℕ, Box3, SymbolicObj3 (Rect3R, Sphere, Cylinder, Complement3, UnionR3, IntersectR3, DifferenceR3, Translate3, Scale3, Rotate3, Rotate3V, Mirror3, Shell3, Outset3, EmbedBoxedObj3, ExtrudeR, ExtrudeOnEdgeOf, ExtrudeRM, RotateExtrude, ExtrudeRotateR), SymbolicObj2 (Rotate2, RectR), (⋯*), fromFastℕtoℝ, fromFastℕ)
 
 import Graphics.Implicit.ObjectUtil.GetBox2 (getBox2, getBox2R)
 
-import Data.VectorSpace ((^-^), (^+^))
+import Data.VectorSpace ((^-^), (^+^), (*^), (<.>), normalized)
 
 -- FIXME: many variables are being ignored here. no rounding for intersect, or difference.. etc.
 
@@ -98,6 +98,17 @@ getBox3 (Rotate3 (a, b, c) symbObj) =
         ((minimum xs, minimum ys, minimum zs), (maximum xs, maximum ys, maximum zs))
 
 getBox3 (Rotate3V _ v symbObj) = getBox3 (Rotate3 v symbObj)
+
+getBox3 (Mirror3 v symObj) =
+    let
+        mir a = a ^+^ ((-2 * (a <.> vn)) *^ vn)
+            where vn = normalized v
+        (a, b) = getBox3 symObj
+        (x1, y1, z1) = mir a
+        (x2, y2, z2) = mir b
+    in
+        ((min x1 x2, min y1 y2, min z1 z2), (max x1 x2, max y1 y2, max z1 z2))
+
 -- Boundary mods
 getBox3 (Shell3 w symbObj) =
     outsetBox (w/2) $ getBox3 symbObj

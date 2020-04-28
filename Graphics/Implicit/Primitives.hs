@@ -10,6 +10,7 @@
 module Graphics.Implicit.Primitives (
                                      translate,
                                      scale,
+                                     mirror,
                                      outset,
                                      complement, union, intersect, difference,
                                      unionR, intersectR, differenceR,
@@ -50,6 +51,7 @@ import Graphics.Implicit.Definitions (ℝ, ℝ2, ℝ3, Box2,
                                                    Translate2,
                                                    Scale2,
                                                    Rotate2,
+                                                   Mirror2,
                                                    Outset2,
                                                    Shell2,
                                                    EmbedBoxedObj2
@@ -66,6 +68,7 @@ import Graphics.Implicit.Definitions (ℝ, ℝ2, ℝ3, Box2,
                                                    Scale3,
                                                    Rotate3,
                                                    Rotate3V,
+                                                   Mirror3,
                                                    Outset3,
                                                    Shell3,
                                                    EmbedBoxedObj3,
@@ -172,6 +175,11 @@ class Object obj vec | obj -> vec where
         -> obj  -- ^ Object to scale
         -> obj  -- ^ Resulting scaled object
 
+    mirror ::
+        vec     -- ^ Normal vector of a plane intersecting the origin through which to mirror object
+        -> obj  -- ^ Object to mirror
+        -> obj  -- ^ Resulting mirrored object
+
     -- | Outset of an object.
     outset ::
         ℝ        -- ^ distance to outset
@@ -203,6 +211,7 @@ class Object obj vec | obj -> vec where
 instance Object SymbolicObj2 ℝ2 where
     translate   = Translate2
     scale       = Scale2
+    mirror      = Mirror2
     complement  = Complement2
     unionR      = UnionR2
     intersectR  = IntersectR2
@@ -216,6 +225,7 @@ instance Object SymbolicObj2 ℝ2 where
 instance Object SymbolicObj3 ℝ3 where
     translate   = Translate3
     scale       = Scale3
+    mirror      = Mirror3
     complement  = Complement3
     unionR      = UnionR3
     intersectR  = IntersectR3

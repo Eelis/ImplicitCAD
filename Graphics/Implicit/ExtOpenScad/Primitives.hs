@@ -15,7 +15,7 @@
 -- Export one set containing all of the primitive modules.
 module Graphics.Implicit.ExtOpenScad.Primitives (primitiveModules) where
 
-import Prelude(Either(Left, Right), Bool(True, False), Maybe(Just, Nothing), ($), pure, either, id, (-), (==), (&&), (<), (*), cos, sin, pi, (/), (>), const, uncurry, fromInteger, round, (/=), (||), not, null, fmap, (<>), otherwise)
+import Prelude(Either(Left, Right), Bool(True, False), Maybe(Just, Nothing), ($), pure, either, id, (-), (==), (&&), (<), (*), cos, sin, pi, (/), (>), const, uncurry, fromInteger, round, (/=), (||), not, null, fmap, (<>), otherwise, error)
 
 import Graphics.Implicit.Definitions (ℝ, ℝ2, ℝ3, ℕ, SymbolicObj2, SymbolicObj3, fromℕtoℝ)
 
@@ -30,7 +30,7 @@ import Graphics.Implicit.ExtOpenScad.Util.OVal (OTypeMirror, caseOType, divideOb
 import Graphics.Implicit.ExtOpenScad.Util.StateC (errorC)
 
 -- Note the use of a qualified import, so we don't have the functions in this file conflict with what we're importing.
-import qualified Graphics.Implicit.Primitives as Prim (sphere, rect3R, rectR, translate, circle, polygonR, extrudeR, cylinder2, union, unionR, intersect, intersectR, difference, differenceR, rotate, rotate3V, rotate3, scale, extrudeRM, rotateExtrude, shell, pack3, pack2)
+import qualified Graphics.Implicit.Primitives as Prim (sphere, rect3R, rectR, translate, circle, polygonR, extrudeR, cylinder2, union, unionR, intersect, intersectR, difference, differenceR, rotate, rotate3V, rotate3, scale, mirror, extrudeRM, rotateExtrude, shell, pack3, pack2)
 
 import Control.Monad (mplus)
 
@@ -61,6 +61,7 @@ primitiveModules =
   , onModIze translate [([("x", noDefault), ("y", noDefault), ("z", noDefault)], requiredSuite), ([("v", noDefault)], requiredSuite)]
   , onModIze rotate [([("a", noDefault), ("v", hasDefault)], requiredSuite)]
   , onModIze scale [([("v", noDefault)], requiredSuite)]
+  , onModIze mirror [([("v", noDefault)], requiredSuite)]
   , onModIze extrude [([("height", hasDefault), ("center", hasDefault), ("twist", hasDefault), ("scale", hasDefault), ("translate", hasDefault), ("r", hasDefault)], requiredSuite)]
   , onModIze rotateExtrude [([("angle", hasDefault), ("r", hasDefault), ("translate", hasDefault), ("rotate", hasDefault)], requiredSuite)]
   , onModIze shell [([("w", noDefault)], requiredSuite)]
@@ -417,6 +418,18 @@ scale = moduleWithSuite "scale" $ \_ children -> do
         Left   x              -> scaleObjs (x,x) (x,x,x)
         Right (Left (x,y))    -> scaleObjs (x,y) (x,y,1)
         Right (Right (x,y,z)) -> scaleObjs (x,y) (x,y,z)
+
+mirror :: (Symbol, SourcePosition -> [OVal] -> ArgParser (StateC [OVal]))
+mirror = moduleWithSuite "mirror" $ \_ children -> do
+    example "mirror([0,1,0]) cube(5);"
+    v <- argument "v"
+        `doc` "normal vector of a plane intersecting the origin through which to mirror the object"
+    let
+        mirrorObjs a b =
+            objMap (Prim.mirror a) (Prim.mirror b) children
+    pure $ pure $ case v of
+        Left (x,y)    -> mirrorObjs (x,y) (error "todo")
+        Right (x,y,z) -> mirrorObjs (x,y) (x,y,z)
 
 -- | FIXME: avoid the approximation in getBox3. better definition of function()?
 extrude :: (Symbol, SourcePosition -> [OVal] -> ArgParser (StateC [OVal]))
